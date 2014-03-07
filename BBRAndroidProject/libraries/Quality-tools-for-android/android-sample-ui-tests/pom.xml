@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.octo.android</groupId>
+		<artifactId>android-sample-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>android-sample-ui-tests</artifactId>
+	<packaging>jar</packaging>
+	<name>android-sample-ui-tests</name>
+
+	<properties>
+		<maven.test.failure.ignore>true</maven.test.failure.ignore>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>android</groupId>
+			<artifactId>android</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>android.test.uiautomator</groupId>
+			<artifactId>uiautomator</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.rtyley</groupId>
+			<artifactId>android-screenshot-celebrity</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<testSourceDirectory>${test.directory}</testSourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+				<configuration>
+					<lint>
+						<skip>true</skip>
+					</lint>
+					<push>
+						<source>${project.build.directory}/${project.artifactId}-${project.version}.jar</source>
+						<destination>/data/local/tmp/</destination>
+					</push>
+					<pull>
+						<source>/sdcard/uiautomator-screenshots/</source>
+						<destination>${project.build.directory}/screenshots</destination>
+					</pull>
+					<attachJar>false</attachJar>
+					<dex>
+					</dex>
+					<test>
+						<createReport>true</createReport>
+					</test>
+					<proguard>
+						<skip>true</skip>
+					</proguard>
+					<uiautomator>
+						<skip>false</skip>
+						<testClassOrMethods>
+							<testClassOrMethod>com.octo.android.sample.uitest.UIAutomatorSampleTest#testSettingsApp</testClassOrMethod>
+							<testClassOrMethod>com.octo.android.sample.uitest.UIAutomatorSampleTest#testCalculatorApp</testClassOrMethod>
+						</testClassOrMethods>
+						<createReport>true</createReport>
+						<takeScreenshotOnFailure>true</takeScreenshotOnFailure>
+					</uiautomator>
+				</configuration>
+				<executions>
+					<execution>
+						<id>install-jar-to-device</id>
+						<phase>install</phase>
+						<goals>
+							<goal>push</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>dex-classes</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>dex</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>ui-test</id>
+						<phase>install</phase>
+						<goals>
+							<goal>uiautomator</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>get-screenshots-from-device</id>
+						<phase>install</phase>
+						<goals>
+							<goal>pull</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<classesDirectory>${project.build.directory}/</classesDirectory>
+					<includes>
+						<include>classes.dex</include>
+					</includes>
+				</configuration>
+			</plugin>
+
+			<!-- Quality analysis tools -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>spoon</id>
+			<properties>
+				<!-- skip robolectric tests -->
+				<skipTests>true</skipTests>
+			</properties>
+		</profile>
+	</profiles>
+</project>
